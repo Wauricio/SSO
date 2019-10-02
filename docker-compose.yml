@@ -1,0 +1,35 @@
+version: '3'
+services:
+ mysql:
+    image: 'mysql'
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    networks: 
+      - syssso
+    environment:
+      - MYSQL_DATABASE=SSODB
+      - MYSQL_USER=SSOSYS
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root_password
+ sso:
+    build: .
+    #image: jboss/keycloak
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    networks: 
+      - syssso
+    environment:
+      - DB_USER=SSOSYS
+      - DB_PASSWORD=password
+      - DB_DATABASE=SSODB
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_DEFAULT_THEME=MyTheme
+      - KEYCLOAK_IMPORT=/tmp/realm.json
+    volumes:
+      - ./realm.json:/tmp/realm.json 
+networks:
+  syssso:      
